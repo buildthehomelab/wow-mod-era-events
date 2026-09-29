@@ -17,6 +17,7 @@
 #include <vector>
 
 class Creature;
+class GameObject;
 class Map;
 class Player;
 class TempSummon;
@@ -103,6 +104,9 @@ namespace EraEvents
         // event stops.
         TempSummon* Summon(uint32 entry, Position const& pos, uint32 despawnMs = 0);
 
+        // Places a gameobject in the event's phase until the event stops.
+        GameObject* SummonObject(uint32 entry, Position const& pos);
+
         // Nearby point on the ground around center.
         Position RandomPointAround(Position const& center, float minDist, float maxDist) const;
 
@@ -116,6 +120,7 @@ namespace EraEvents
         Map* _map = nullptr;
         ObjectGuid _anchor;
         std::vector<ObjectGuid> _summons;
+        std::vector<ObjectGuid> _objects;
         bool _won = false;
     };
 

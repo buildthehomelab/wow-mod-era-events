@@ -28,6 +28,7 @@
 #include "Creature.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "GameObject.h"
 #include "Item.h"
 #include "Log.h"
 #include "Mail.h"
@@ -161,6 +162,7 @@ namespace EraEvents
                 _initialized = true;
                 _slots[EVENT_AQ_WAR].event = CreateAQWarEvent();
                 _slots[EVENT_SCOURGE_INVASION].event = CreateScourgeInvasionEvent();
+                _slots[EVENT_LEGION_INCURSION].event = CreateLegionIncursionEvent();
 
                 for (Slot& slot : _slots)
                     if (slot.event)
@@ -674,6 +676,20 @@ namespace EraEvents
         return summon;
     }
 
+    GameObject* EraEvent::SummonObject(uint32 entry, Position const& pos)
+    {
+        Creature* anchor = GetAnchor();
+        if (!anchor)
+            return nullptr;
+
+        // Summoned from the anchor, so it's in the event's phase. Lasts a day; Stop removes it.
+        GameObject* object = anchor->SummonGameObject(entry, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(),
+            pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, DAY);
+        if (object)
+            _objects.push_back(object->GetGUID());
+        return object;
+    }
+
     Position EraEvent::RandomPointAround(Position const& center, float minDist, float maxDist) const
     {
         Creature* anchor = GetAnchor();
@@ -728,11 +744,16 @@ namespace EraEvents
                 if (Creature* creature = _map->GetCreature(guid))
                     creature->DespawnOrUnsummon();
 
+            for (ObjectGuid const& guid : _objects)
+                if (GameObject* object = _map->GetGameObject(guid))
+                    object->DespawnOrUnsummon();
+
             if (Creature* anchor = _map->GetCreature(_anchor))
                 anchor->DespawnOrUnsummon();
         }
 
         _summons.clear();
+        _objects.clear();
         _anchor.Clear();
         _map = nullptr;
     }
@@ -920,4 +941,5 @@ void AddEraEventsScripts()
     AddEraEventMobScripts();
     AddEraEventAQScripts();
     AddEraEventScourgeScripts();
+    AddEraEventLegionScripts();
 }

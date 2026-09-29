@@ -86,3 +86,21 @@ EraEvents.ScourgeInvasion.RewardFaction = 529
 EraEvents.ScourgeInvasion.RewardReputation = 250
 EraEvents.ScourgeInvasion.RewardItem = 22484
 EraEvents.ScourgeInvasion.RewardItemCount = 5
+
+#
+#    Legion Incursion (tier 7: after Naxxramas, before the Dark Portal opens)
+#        A fel portal opens outside Gadgetzan, Everlook, Cenarion Hold, Nethergarde Keep or Light's
+#        Hope Chapel and demons march on the town, led by a Dreadlord and finally a Pit Commander.
+#        Rewards Argent Dawn reputation.
+#
+
+EraEvents.LegionIncursion.Enable = 1
+EraEvents.LegionIncursion.IntervalMin = 120
+EraEvents.LegionIncursion.IntervalMax = 240
+EraEvents.LegionIncursion.WarningMinutes = 10
+EraEvents.LegionIncursion.DurationMinutes = 30
+EraEvents.LegionIncursion.RewardGold = 20
+EraEvents.LegionIncursion.RewardFaction = 529
+EraEvents.LegionIncursion.RewardReputation = 150
+EraEvents.LegionIncursion.RewardItem = 0
+EraEvents.LegionIncursion.RewardItemCount = 0
