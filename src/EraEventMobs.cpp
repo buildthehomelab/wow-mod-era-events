@@ -46,6 +46,8 @@ namespace EraEvents
         if (!creature)
             return;
 
+        // Home is where it's headed, so a fight on the way ends with it carrying on there.
+        creature->SetHomePosition(dest);
         creature->SetWalk(!run);
         creature->GetMotionMaster()->MovePoint(POINT_ARRIVE, dest);
     }
@@ -123,6 +125,20 @@ struct npc_era_event_mob : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        // Event armies fight each other, not only players: look for the nearest enemy now and
+        // then while idle.
+        if (_def && _def->seekEnemies && !me->IsInCombat())
+        {
+            if (_seekTimer <= diff)
+            {
+                _seekTimer = 2 * IN_MILLISECONDS;
+                if (Unit* target = me->SelectNearestTarget(30.0f))
+                    AttackStart(target);
+            }
+            else
+                _seekTimer -= diff;
+        }
+
         if (!UpdateVictim())
             return;
 
@@ -142,6 +158,7 @@ struct npc_era_event_mob : public ScriptedAI
 private:
     MobDef const* _def;
     bool _enraged = false;
+    uint32 _seekTimer = 0;
 };
 
 // The invisible creature an event spawns everything from. It only speaks.

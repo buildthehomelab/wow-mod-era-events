@@ -44,12 +44,14 @@ namespace EraEvents
         uint32 deathSpell = 0;
         uint32 enrageSpell = 0;
         uint8 enragePct = 0;
+        bool seekEnemies = false; // attacks hostile creatures nearby, not only players
     };
 
     void RegisterMob(uint32 entry, MobDef def);
     MobDef const* FindMob(uint32 entry);
 
-    // Walks (or runs) a creature to dest, which becomes its home once it gets there.
+    // Walks (or runs) a creature to dest, which becomes its home: after a fight on the way it
+    // carries on there instead of going back.
     void SendTo(Creature* creature, Position const& dest, bool run = true);
 
     void CastTimedSpell(CreatureAI* ai, TimedSpell const& spell);

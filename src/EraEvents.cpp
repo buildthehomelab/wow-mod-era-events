@@ -159,6 +159,7 @@ namespace EraEvents
                     return;
 
                 _initialized = true;
+                _slots[EVENT_AQ_WAR].event = CreateAQWarEvent();
                 _slots[EVENT_SCOURGE_INVASION].event = CreateScourgeInvasionEvent();
 
                 for (Slot& slot : _slots)
@@ -917,5 +918,6 @@ void AddEraEventsScripts()
     new EraEventsPlayerScript();
     new EraEventsCommandScript();
     AddEraEventMobScripts();
+    AddEraEventAQScripts();
     AddEraEventScourgeScripts();
 }

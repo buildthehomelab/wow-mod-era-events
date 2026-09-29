@@ -53,6 +53,24 @@ EraEvents.RetryMinutes = 5
 #
 
 #
+#    Gates of Ahn'Qiraj (tier 4: the gong has been rung, the war isn't won yet)
+#        Waves of Qiraji storm out of the Scarab Wall against a Kaldorei line; the flashback's
+#        dragons join in, then Lieutenant General Nokhor. Also breaks out the moment anyone
+#        completes Bang a Gong!, with no minimum number of players. Rewards Cenarion Circle reputation.
+#
+
+EraEvents.AQWar.Enable = 1
+EraEvents.AQWar.IntervalMin = 120
+EraEvents.AQWar.IntervalMax = 240
+EraEvents.AQWar.WarningMinutes = 10
+EraEvents.AQWar.DurationMinutes = 45
+EraEvents.AQWar.RewardGold = 20
+EraEvents.AQWar.RewardFaction = 609
+EraEvents.AQWar.RewardReputation = 250
+EraEvents.AQWar.RewardItem = 0
+EraEvents.AQWar.RewardItemCount = 0
+
+#
 #    Scourge Invasion (tier 6: after Ahn'Qiraj, before Naxxramas)
 #        Takes turns between an abomination loose in Stormwind or Undercity and a necropolis surge
 #        in one of the six invasion zones. Rewards Argent Dawn reputation and Necrotic Runes.
