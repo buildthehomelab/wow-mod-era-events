@@ -86,11 +86,15 @@ namespace EraEvents
         // over in the world update, so the creature may already be gone.
         virtual void OnSummonDied(ObjectGuid /*guid*/, uint32 /*entry*/) { }
 
+        // A player used one of the event's gameobjects. Queued like deaths.
+        virtual void OnObjectUsed(ObjectGuid /*guid*/, uint32 /*entry*/, Position const& /*pos*/) { }
+
         // Despawns everything the event spawned.
         void Stop();
 
         bool IsWon() const { return _won; }
         bool IsSummon(ObjectGuid guid) const;
+        bool IsObject(ObjectGuid guid) const;
         void Adopt(ObjectGuid guid) { _summons.push_back(guid); }
 
     protected:
@@ -140,6 +144,9 @@ namespace EraEvents
 
     // An event creature summoned something of its own; the event despawns it with the rest.
     void NotifySummoned(Creature* summoner, Creature* summon);
+
+    // A player used an event gameobject. Safe from any map thread.
+    void NotifyObjectUsed(GameObject* object);
 
     // Starts an event now, skipping the interval and the player count. Safe from any map thread;
     // it happens on the next world update.

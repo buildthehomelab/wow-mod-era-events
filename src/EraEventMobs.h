@@ -45,6 +45,11 @@ namespace EraEvents
         uint32 enrageSpell = 0;
         uint8 enragePct = 0;
         bool seekEnemies = false; // attacks hostile creatures nearby, not only players
+
+        // Chance per melee hit to put hitAura on a player, unless they have hitAuraBlocker.
+        uint32 hitAura = 0;
+        uint8 hitAuraChance = 0;
+        uint32 hitAuraBlocker = 0;
     };
 
     void RegisterMob(uint32 entry, MobDef def);

@@ -163,6 +163,7 @@ namespace EraEvents
                 _slots[EVENT_AQ_WAR].event = CreateAQWarEvent();
                 _slots[EVENT_SCOURGE_INVASION].event = CreateScourgeInvasionEvent();
                 _slots[EVENT_LEGION_INCURSION].event = CreateLegionIncursionEvent();
+                _slots[EVENT_ZOMBIE_INFESTATION].event = CreateZombieInfestationEvent();
 
                 for (Slot& slot : _slots)
                     if (slot.event)
@@ -303,6 +304,12 @@ namespace EraEvents
                 _deaths.emplace_back(guid, entry);
             }
 
+            void QueueUse(ObjectGuid guid, uint32 entry, Position const& pos)
+            {
+                std::lock_guard<std::mutex> lock(_queueLock);
+                _uses.push_back({ guid, entry, pos });
+            }
+
             void QueueAdopt(ObjectGuid summoner, ObjectGuid summon)
             {
                 std::lock_guard<std::mutex> lock(_queueLock);
@@ -328,13 +335,20 @@ namespace EraEvents
             {
                 std::vector<std::pair<ObjectGuid, uint32>> deaths;
                 std::vector<std::pair<ObjectGuid, ObjectGuid>> adoptions;
+                std::vector<ObjectUse> uses;
                 std::vector<EventType> starts;
                 {
                     std::lock_guard<std::mutex> lock(_queueLock);
                     deaths.swap(_deaths);
                     adoptions.swap(_adoptions);
+                    uses.swap(_uses);
                     starts.swap(_starts);
                 }
+
+                for (ObjectUse const& use : uses)
+                    for (Slot& slot : _slots)
+                        if (slot.event && slot.state == State::Running && slot.event->IsObject(use.guid))
+                            slot.event->OnObjectUsed(use.guid, use.entry, use.pos);
 
                 for (auto const& [summoner, summon] : adoptions)
                     for (Slot& slot : _slots)
@@ -534,6 +548,14 @@ namespace EraEvents
             std::mutex _queueLock;
             std::vector<std::pair<ObjectGuid, uint32>> _deaths;
             std::vector<std::pair<ObjectGuid, ObjectGuid>> _adoptions;
+
+            struct ObjectUse
+            {
+                ObjectGuid guid;
+                uint32 entry;
+                Position pos;
+            };
+            std::vector<ObjectUse> _uses;
             std::vector<EventType> _starts;
         };
 
@@ -623,6 +645,12 @@ namespace EraEvents
     {
         if (summoner && summon)
             Mgr().QueueAdopt(summoner->GetGUID(), summon->GetGUID());
+    }
+
+    void NotifyObjectUsed(GameObject* object)
+    {
+        if (object)
+            Mgr().QueueUse(object->GetGUID(), object->GetEntry(), object->GetPosition());
     }
 
     void RequestStart(EventType type)
@@ -732,6 +760,11 @@ namespace EraEvents
     bool EraEvent::IsSummon(ObjectGuid guid) const
     {
         return std::find(_summons.begin(), _summons.end(), guid) != _summons.end();
+    }
+
+    bool EraEvent::IsObject(ObjectGuid guid) const
+    {
+        return std::find(_objects.begin(), _objects.end(), guid) != _objects.end();
     }
 
     void EraEvent::Stop()
@@ -942,4 +975,5 @@ void AddEraEventsScripts()
     AddEraEventAQScripts();
     AddEraEventScourgeScripts();
     AddEraEventLegionScripts();
+    AddEraEventZombieScripts();
 }

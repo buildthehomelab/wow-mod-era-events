@@ -115,6 +115,18 @@ struct npc_era_event_mob : public ScriptedAI
             me->SetHomePosition(me->GetPosition());
     }
 
+    void DamageDealt(Unit* victim, uint32& /*damage*/, DamageEffectType damageType, SpellSchoolMask /*schoolMask*/) override
+    {
+        if (!_def || !_def->hitAura || damageType != DIRECT_DAMAGE || !victim || !victim->IsPlayer())
+            return;
+
+        if (victim->HasAura(_def->hitAura) || (_def->hitAuraBlocker && victim->HasAura(_def->hitAuraBlocker)))
+            return;
+
+        if (roll_chance_i(_def->hitAuraChance))
+            me->AddAura(_def->hitAura, victim);
+    }
+
     void JustDied(Unit* /*killer*/) override
     {
         if (_def && _def->deathSpell)

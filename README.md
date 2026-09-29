@@ -1,0 +1,122 @@
+# Era Events
+
+An [AzerothCore](https://www.azerothcore.org/) (WotLK 3.3.5a) module that brings back the iconic
+world events of each era as **timed live events**, for servers running
+[mod-individual-progression](https://github.com/ZhengPeiRu21/mod-individual-progression).
+
+With individual progression, every character is in its own era. IP already sets the scene for
+each one (the War Effort, the outdoor AQ war, the Scourge Invasion's necropolises, the Legion at
+the Dark Portal), but nothing ever *happens* there. This module adds the moments:
+
+| Event | Era (IP tier) | What happens |
+| --- | --- | --- |
+| **Gates of Ahn'Qiraj** | 4: the gong is rung | The Qiraji swarm storms out of the Scarab Wall in waves against a line of Kaldorei infantry. Merithra, Arygos and Caelestrasz join in one after another and strafe the swarm, then Lieutenant General Nokhor leads the last push. Also breaks out **the moment anyone bangs the gong**. |
+| **Scourge Invasion** | 6: after AQ, before Naxxramas | Takes turns: a Pallid Horror or Patchwork Terror marches through Stormwind or Undercity dragging Flameshockers along, or the Herald of the Lich King raises three rare elites and a stream of minions beside a necropolis. |
+| **Legion Incursion** | 7: after Naxxramas, before the Dark Portal | A fel portal tears open outside Gadgetzan, Everlook, Cenarion Hold, Nethergarde Keep or Light's Hope Chapel. Demons march on the town in waves, a Dreadlord leads the middle one and a Pit Commander comes through last. |
+| **Zombie Infestation** | 12: the end of TBC, before Northrend | The 3.0.2 plague in Stormwind or Orgrimmar. Plagued grain crates, rising dead, **infection** ("You're Infected!"), Argent Healers who cure it, and if you're not cured in time you **turn into a zombie** with the original zombie form and its action bar. Your groan infects the living around you. |
+
+## Shared, but only with your era
+
+- **Only your era sees it.** Everything an event spawns sits in a phase of its own, and a character
+  is phased in only while standing in the event's zone *and* at the event's tier. Someone at a
+  different stage in the same city sees nothing and isn't attacked.
+- **Needs company.** A scheduled event only starts when at least **2 real players** at that tier
+  are online (`EraEvents.MinRealPlayers`). Playerbots and GMs don't count towards that, but
+  playerbots at the tier are phased in and fight alongside you. The gong is the one exception: it
+  starts the AQ war even for a single player.
+- **Announced.** Everyone at the tier gets a warning 10 minutes before (on screen and in chat)
+  saying where, then a message when it starts and when it ends.
+- **Rewarded.** Win it and everyone phased in gets gold, reputation (Cenarion Circle for AQ, Argent
+  Dawn for the rest) and, for the Scourge Invasion, Necrotic Runes. All configurable. Items go
+  by mail when bags are full.
+
+Each event runs on its own schedule: a random 2 to 4 hours between chances by default. When
+it's due but too few players are online, it checks again every 5 minutes.
+
+## Commands
+
+| Command | Who | What it does |
+| --- | --- | --- |
+| `.era next` | everyone | Your era's event, whether it's running, and when the next chance comes. |
+| `.era list` | GM | Every event, its tier, state and timer, and how many real players are at its tier. |
+| `.era start <aq\|si\|legion\|zombie>` | GM | Start an event now, skipping the notice and the player count. |
+| `.era stop <aq\|si\|legion\|zombie>` | GM | End a running event and despawn it. |
+
+To test an event, put a character at its tier with `.ip set <tier>` (IP's command), go to the zone and
+`.era start <event>`.
+
+## Install
+
+Clone it into your AzerothCore `modules` folder **as `mod-era-events`**, without the repo's `wow-`
+prefix. AzerothCore finds the module's entry point from the folder name.
+
+```bash
+cd <azerothcore>/modules
+git clone https://github.com/buildthehomelab/wow-mod-era-events.git mod-era-events
+```
+
+Rebuild the worldserver, then copy `conf/mod_era_events.conf.dist` to your config folder as
+`mod_era_events.conf`. The world database updates add the event creatures and the phase auras on
+the next start.
+
+No client patch is needed: everything uses spells and models the 3.3.5 client already has.
+
+## Configuration
+
+See `conf/mod_era_events.conf.dist`.
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `EraEvents.Enable` | 1 | Master switch. |
+| `EraEvents.MinRealPlayers` | 2 | Real players at the tier who must be online for a scheduled event to start. |
+| `EraEvents.RetryMinutes` | 5 | How often a due event checks again while waiting for players. |
+
+Each event (`AQWar`, `ScourgeInvasion`, `LegionIncursion`, `ZombieInfestation`) has its own set,
+for example `EraEvents.ScourgeInvasion.Enable`:
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `.Enable` | 1 | 0 never runs it; GMs can't start it either. |
+| `.IntervalMin` / `.IntervalMax` | 120 / 240 | Minutes between one event and the next chance, picked at random. |
+| `.WarningMinutes` | 10 | Notice before it starts. 0 starts it straight away. |
+| `.DurationMinutes` | 30 (AQ 45) | How long players have before the event gives up. |
+| `.RewardGold` | 15-50 | Gold for everyone taking part when it's won. |
+| `.RewardFaction` / `.RewardReputation` | 609 or 529 / 150-250 | Reputation reward. Faction 0 for none. |
+| `.RewardItem` / `.RewardItemCount` | 22484 x5 for SI, else none | Item reward. |
+
+The module reads `IndividualProgression.Enable` and `IndividualProgression.ProgressionLimit` from
+IP's config: with IP off no era has players, and an event whose tier is beyond the progression
+limit never runs.
+
+## How it works
+
+- A character's era is read from IP's hidden progression quests (66000 + tier), the same way IP
+  reads it. The module doesn't link against IP.
+- Each event owns a phase bit IP doesn't use (IP uses 16-21, this module 22-25) and a server-side
+  aura that adds it, like IP's own "Phase Shift" auras. The two stack, so IP's phasing in the same
+  zones keeps working.
+- An event spawns an invisible anchor and summons everything else from it, so it all inherits the
+  event's phase. The anchor keeps the area loaded and updating while nobody is near.
+- The creatures are copies of Blizzard's, with this module's scripts: the originals' own scripts
+  write the core's global Scourge Invasion state or run the Ahn'Qiraj quest flashback.
+
+## IDs used
+
+- `creature_template` 9500800-9500809 (Scourge Invasion), 9500810-9500818 (AQ), 9500820-9500827
+  (Legion), 9500850-9500853 (Zombie)
+- `gameobject_template` 9500854 (plagued grain crate)
+- `spell_dbc` 90120-90123 (phase auras)
+- `spell_script_names` 56560 (Beckoning Groan, on the zombie form's bar)
+- phase bits 22-25 (4194304, 8388608, 16777216, 33554432)
+
+## Notes
+
+- The Scourge Invasion here is its own, not the core's world event (game event 17). Leave that one
+  off; mod-individual-progression disables it too.
+- Zombie players get the invasion's faction for as long as they're turned, so the dead leave them
+  alone. City guards don't: turning in the middle of Stormwind is dangerous.
+- Events don't survive a restart: a running event is simply gone, and the schedule starts over.
+
+## License
+
+MIT

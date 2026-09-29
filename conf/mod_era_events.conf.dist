@@ -104,3 +104,21 @@ EraEvents.LegionIncursion.RewardFaction = 529
 EraEvents.LegionIncursion.RewardReputation = 150
 EraEvents.LegionIncursion.RewardItem = 0
 EraEvents.LegionIncursion.RewardItemCount = 0
+
+#
+#    Zombie Infestation (tier 12: the end of the Burning Crusade, before Northrend)
+#        The 3.0.2 plague in Stormwind or Orgrimmar. Zombies infect; Argent Healers cure; the
+#        infected who aren't cured in time turn into zombies for three minutes. Smash the plagued
+#        grain crates and kill the dead to win. Rewards Argent Dawn reputation.
+#
+
+EraEvents.ZombieInfestation.Enable = 1
+EraEvents.ZombieInfestation.IntervalMin = 120
+EraEvents.ZombieInfestation.IntervalMax = 240
+EraEvents.ZombieInfestation.WarningMinutes = 10
+EraEvents.ZombieInfestation.DurationMinutes = 30
+EraEvents.ZombieInfestation.RewardGold = 50
+EraEvents.ZombieInfestation.RewardFaction = 529
+EraEvents.ZombieInfestation.RewardReputation = 250
+EraEvents.ZombieInfestation.RewardItem = 0
+EraEvents.ZombieInfestation.RewardItemCount = 0
