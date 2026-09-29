@@ -1,0 +1,70 @@
+[worldserver]
+
+########################################
+# mod-era-events
+########################################
+#
+#    Timed live world events for mod-individual-progression. Each event belongs to one era
+#    (IP progression tier): only characters at that tier see it, and a scheduled event only starts
+#    when enough real players at that tier are online.
+#
+
+#
+#    EraEvents.Enable
+#        Description: Master switch.
+#        Default:     1
+#
+
+EraEvents.Enable = 1
+
+#
+#    EraEvents.MinRealPlayers
+#        Description: Real players (not playerbots, not GMs) at an event's tier who must be online
+#                     for a scheduled event to start. Playerbots at the tier still join in.
+#        Default:     2
+#
+
+EraEvents.MinRealPlayers = 2
+
+#
+#    EraEvents.RetryMinutes
+#        Description: While an event is due but too few players are online, how often it checks again.
+#        Default:     5
+#
+
+EraEvents.RetryMinutes = 5
+
+########################################
+# Per event
+########################################
+#
+#    Every event takes the same settings, after its name:
+#
+#    EraEvents.<Event>.Enable            1 to schedule it, 0 to never run it (GMs can't start it either).
+#    EraEvents.<Event>.IntervalMin       Minutes between one event and the next chance of another,
+#    EraEvents.<Event>.IntervalMax       picked at random between the two.
+#    EraEvents.<Event>.WarningMinutes    Notice the players of that era get before it starts. 0 = none.
+#    EraEvents.<Event>.DurationMinutes   How long the players have before the event gives up.
+#    EraEvents.<Event>.RewardGold        Gold for everyone taking part when it's won.
+#    EraEvents.<Event>.RewardFaction     Faction id for the reputation reward, 0 for none.
+#    EraEvents.<Event>.RewardReputation  Reputation for that faction.
+#    EraEvents.<Event>.RewardItem        Item id handed out as well, 0 for none. Sent by mail when bags are full.
+#    EraEvents.<Event>.RewardItemCount   How many of that item.
+#
+
+#
+#    Scourge Invasion (tier 6: after Ahn'Qiraj, before Naxxramas)
+#        Takes turns between an abomination loose in Stormwind or Undercity and a necropolis surge
+#        in one of the six invasion zones. Rewards Argent Dawn reputation and Necrotic Runes.
+#
+
+EraEvents.ScourgeInvasion.Enable = 1
+EraEvents.ScourgeInvasion.IntervalMin = 120
+EraEvents.ScourgeInvasion.IntervalMax = 240
+EraEvents.ScourgeInvasion.WarningMinutes = 10
+EraEvents.ScourgeInvasion.DurationMinutes = 30
+EraEvents.ScourgeInvasion.RewardGold = 15
+EraEvents.ScourgeInvasion.RewardFaction = 529
+EraEvents.ScourgeInvasion.RewardReputation = 250
+EraEvents.ScourgeInvasion.RewardItem = 22484
+EraEvents.ScourgeInvasion.RewardItemCount = 5
