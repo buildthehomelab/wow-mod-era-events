@@ -45,7 +45,17 @@ it's due but too few players are online, it checks again every 5 minutes.
 To test an event, put a character at its tier with `.ip set <tier>` (IP's command), go to the zone and
 `.era start <event>`.
 
-## Install
+## Requirements
+
+- [AzerothCore](https://www.azerothcore.org/) wotlk (master) and a WoW 3.3.5a (12340) client.
+- [mod-individual-progression](https://github.com/ZhengPeiRu21/mod-individual-progression) with
+  `IndividualProgression.Enable = 1`. Events are tied to its progression tiers; with IP off no
+  era has players. The module reads IP's hidden progression quests and config but doesn't link
+  against it.
+- No client patch. [mod-playerbots](https://github.com/mod-playerbots/mod-playerbots) is optional:
+  bots at the tier are phased in and fight alongside you.
+
+## Installation
 
 Clone it into your AzerothCore `modules` folder **as `mod-era-events`**, without the repo's `wow-`
 prefix. AzerothCore finds the module's entry point from the folder name.
@@ -117,6 +127,24 @@ limit never runs.
   alone. City guards don't: turning in the middle of Stormwind is dangerous.
 - Events don't survive a restart: a running event is simply gone, and the schedule starts over.
 
+## Troubleshooting
+
+- **An event never starts by itself:** a scheduled event needs at least 2 real players at its tier
+  online (`EraEvents.MinRealPlayers`), and bots and GMs don't count. It checks again every 5
+  minutes. Also check `EraEvents.Enable`, the event's own `.Enable`, and that its tier isn't past
+  `IndividualProgression.ProgressionLimit`.
+- **You can't see a running event:** only characters standing in the event's zone and at its tier
+  are phased in. Check your tier with `.era next`, and set a test character's with `.ip set <tier>`.
+- **Testing an event:** a GM can run `.era start <aq|si|legion|zombie>`, which skips the notice and
+  the player count, and `.era stop` to end it.
+- **Two Scourge Invasions at once:** the core's game event 17 is on. Leave it off.
+
+## Credits
+
+The module is built for [mod-individual-progression](https://github.com/ZhengPeiRu21/mod-individual-progression) by ZhengPeiRu21 and reads its progression state.
+
+Author: [buildthehomelab](https://github.com/buildthehomelab)
+
 ## License
 
-MIT
+MIT, see [LICENSE](LICENSE).
